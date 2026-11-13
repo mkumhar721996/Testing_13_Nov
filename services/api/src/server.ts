@@ -1,10 +1,10 @@
 import { buildApp } from './app.js';
-import { devResolveUserId } from './dev-session.js';
+import { serverSession } from './dev-session.js';
 
 const port = Number(process.env.PORT ?? 3000);
-const host = process.env.HOST ?? '0.0.0.0';
+const { resolveUserId, host } = serverSession(process.env);
 
-buildApp({ resolveUserId: devResolveUserId(process.env) })
+buildApp({ resolveUserId })
   .listen({ port, host })
   .catch((err) => {
     console.error(err);
