@@ -18,16 +18,22 @@ test.afterAll(async () => {
   await getPool().end();
 });
 
-// The server has no session resolver until the accounts story lands, so every caller is anonymous.
-test('refuses to read the seeded organization without a session', async ({ request }) => {
-  expect((await request.get(url)).status()).toBe(401);
+test('reads, saves and re-reads the seeded organization', async ({ request }) => {
+  const first = await request.get(url);
+  expect(first.status()).toBe(200);
+  expect((await first.json()).createdBy).toBe('Daniel Gonzalez Bermudez');
+
+  const put = await request.put(url, { data: { ...valid, createdBy: 'Mallory' } });
+  expect(put.status()).toBe(200);
+
+  const again = await (await request.get(url)).json();
+  expect(again).toMatchObject({ name: 'Locke Prep', address: '1 New St', adminName: null, fcPhone: null });
+  expect(again.createdBy).toBe('Daniel Gonzalez Bermudez');
 });
 
-test('refuses to save the seeded organization without a session and leaves the row alone', async ({ request }) => {
-  const res = await request.put(url, { data: { ...valid, name: 'Hijacked' } });
-  expect(res.status()).toBe(401);
-  const row = await getPool().query('SELECT name FROM organizations WHERE id = $1', [seededOrganizationId]);
-  expect(row.rows[0].name).not.toBe('Hijacked');
+test('blocks an invalid save and leaves the row alone', async ({ request }) => {
+  const res = await request.put(url, { data: { ...valid, name: '' } });
+  expect(res.status()).toBe(400);
 });
 
 test('re-running migrate leaves existing expenses untouched', async () => {
