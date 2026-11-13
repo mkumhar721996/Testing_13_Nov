@@ -15,6 +15,10 @@ export type AppOptions = {
 };
 
 export function buildApp(opts: AppOptions = {}): FastifyInstance {
+  if (!opts.resolveUserId && process.env.NODE_ENV === 'production') {
+    // Without a session resolver every /categories and /expenses call would 401.
+    throw new Error('No session resolver configured: wire the accounts story before running in production');
+  }
   const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
   const auth = requireUser(opts.resolveUserId ?? noUser);
   const categories = opts.categories ?? pgCategoryStore;
