@@ -1,7 +1,10 @@
 import type { FastifyPluginAsync, preHandlerAsyncHookHandler } from 'fastify';
 import type { CategoryStore } from '../stores/categories.js';
 import type { ExpenseStore } from '../stores/expenses.js';
-import { validateExpenseInput } from '../validation/expense.js';
+import { parseListQuery, validateExpenseInput } from '../validation/expense.js';
+
+const PAGE_SIZE = 20;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Deps = { expenses: ExpenseStore; categories: CategoryStore; today: () => string };
 
@@ -22,4 +25,23 @@ export const expenseRoutes =
       const expense = await deps.expenses.create(userId, result.value);
       return reply.code(201).send(expense);
     });
+
+    app.get('/expenses', { preHandler: requireUser }, async (req, reply) => {
+      const parsed = parseListQuery(req.query);
+      if (!parsed.ok) return reply.code(400).send({ errors: parsed.errors });
+      const { filters, page } = parsed.value;
+      return deps.expenses.list(req.userId!, filters, page, PAGE_SIZE);
+    });
+
+    app.get<{ Params: { id: string } }>(
+      '/expenses/:id',
+      { preHandler: requireUser },
+      async (req, reply) => {
+        const expense = UUID.test(req.params.id)
+          ? await deps.expenses.get(req.userId!, req.params.id)
+          : undefined;
+        if (!expense) return reply.code(404).send({ error: 'not_found' });
+        return expense;
+      },
+    );
   };
