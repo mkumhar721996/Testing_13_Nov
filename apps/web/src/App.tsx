@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import AddExpenseForm from './expenses/AddExpenseForm'
 import ExpenseDetail from './expenses/ExpenseDetail'
+import TopBar from './TopBar'
 import ExpenseList, { emptyQuery } from './expenses/ExpenseList'
 
 type View = { view: 'list' } | { view: 'detail'; id: string } | { view: 'add' }
@@ -12,7 +13,9 @@ export default function App() {
   const toList = () => setCurrent({ view: 'list' })
 
   return (
-    <main>
+    <>
+      <TopBar />
+      <main>
       {current.view === 'list' && (
         <ExpenseList
           initialQuery={query}
@@ -32,6 +35,7 @@ export default function App() {
           <AddExpenseForm />
         </>
       )}
-    </main>
+      </main>
+    </>
   )
 }
