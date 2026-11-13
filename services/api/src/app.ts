@@ -30,7 +30,6 @@ export function buildApp(opts: AppOptions = {}): FastifyInstance {
   app.register(healthRoutes);
   app.register(categoryRoutes(categories, auth));
   app.register(expenseRoutes({ expenses: opts.expenses ?? pgExpenseStore, categories, today }, auth));
-  // Not behind requireUser yet: see the open authentication question for the organization screen.
-  app.register(organizationRoutes({ organizations: opts.organizations ?? pgOrganizationStore }));
+  app.register(organizationRoutes({ organizations: opts.organizations ?? pgOrganizationStore }, auth));
   return app;
 }

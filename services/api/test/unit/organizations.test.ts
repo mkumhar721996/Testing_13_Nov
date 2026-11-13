@@ -48,7 +48,21 @@ describe('organizations API', () => {
 
   beforeEach(() => {
     store = new FakeOrganizations();
-    app = buildApp({ organizations: store });
+    app = buildApp({ organizations: store, resolveUserId: async () => 'user-1' });
+  });
+
+  it('rejects an unauthenticated read and write with 401 and never touches the store', async () => {
+    const anonymous = buildApp({ organizations: store });
+    expect((await anonymous.inject({ method: 'GET', url })).statusCode).toBe(401);
+    expect((await anonymous.inject({ method: 'PUT', url, payload: valid })).statusCode).toBe(401);
+    expect(store.updated).toHaveLength(0);
+  });
+
+  it('blocks a value over the length limit', async () => {
+    const res = await put({ ...valid, name: 'x'.repeat(201) });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().errors.name).toBe('Use 200 characters or fewer.');
+    expect(store.updated).toHaveLength(0);
   });
 
   it('returns every detail of one organization (AC 1)', async () => {

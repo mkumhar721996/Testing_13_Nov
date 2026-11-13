@@ -17,6 +17,7 @@ export type OrganizationValidation =
 // One @, text on both sides, and a dot in the domain.
 const EMAIL = /^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/;
 const PHONE = /^\+?\d{7,15}$/;
+const MAX_LENGTH = 200;
 const EMAIL_MESSAGE = 'Enter an email like name@example.com.';
 const PHONE_MESSAGE = 'Enter 7 to 15 digits, with an optional + at the start.';
 
@@ -35,6 +36,11 @@ export function validateOrganizationInput(body: unknown): OrganizationValidation
   if (adminEmail && !EMAIL.test(adminEmail)) errors.adminEmail = EMAIL_MESSAGE;
   if (fcEmail && !EMAIL.test(fcEmail)) errors.fcEmail = EMAIL_MESSAGE;
   if (fcPhone && !PHONE.test(fcPhone)) errors.fcPhone = PHONE_MESSAGE;
+
+  for (const [field, value] of Object.entries({ name, address: text(b.address), adminName: text(b.adminName), adminEmail, fcName: text(b.fcName), fcEmail, fcPhone })) {
+    const key = field as keyof OrganizationInput;
+    if (!errors[key] && value.length > MAX_LENGTH) errors[key] = `Use ${MAX_LENGTH} characters or fewer.`;
+  }
 
   if (Object.keys(errors).length) return { ok: false, errors };
   return {
