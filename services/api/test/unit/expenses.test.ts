@@ -181,12 +181,50 @@ describe('browse expenses API', () => {
   });
 
   it('passes filters and page to the store (AC 4, 5, 6, 10)', async () => {
-    await get('/expenses?q=%20lunch%20&categoryId=cat-food&from=2026-11-10&to=2026-11-20&page=2');
+    await get(`/expenses?q=%20lunch%20&categoryId=${UUID_OWN}&from=2026-11-10&to=2026-11-20&page=2`);
     expect(store.listCalls[0]).toEqual({
       userId: 'user-1',
-      filters: { q: 'lunch', categoryId: 'cat-food', from: '2026-11-10', to: '2026-11-20' },
+      filters: { q: 'lunch', categoryId: UUID_OWN, from: '2026-11-10', to: '2026-11-20' },
       page: 2,
     });
+  });
+
+  it.each(['abc', 'cat-food', '1; DROP TABLE expenses'])(
+    'rejects a non-uuid categoryId %j with 400 instead of reaching the database',
+    async (categoryId) => {
+      const res = await get(`/expenses?categoryId=${encodeURIComponent(categoryId)}`);
+      expect(res.statusCode).toBe(400);
+      expect(res.json().errors.category).toBeDefined();
+      expect(store.listCalls).toHaveLength(0);
+    },
+  );
+
+  it.each([
+    ['from=2026-02-30', 'an impossible date'],
+    ['to=2026-13-01', 'a month 13'],
+    ['from=2026-11-1', 'a short day'],
+  ])('rejects %s (%s)', async (qs) => {
+    expect((await get(`/expenses?${qs}`)).statusCode).toBe(400);
+  });
+
+  it('accepts a single-day range where from equals to', async () => {
+    const res = await get('/expenses?from=2026-11-15&to=2026-11-15');
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('accepts only a from date or only a to date', async () => {
+    expect((await get('/expenses?from=2026-11-15')).statusCode).toBe(200);
+    expect((await get('/expenses?to=2026-11-15')).statusCode).toBe(200);
+  });
+
+  it('falls back to page 1 for a repeated page param', async () => {
+    await get('/expenses?page=2&page=3');
+    expect(store.listCalls[0].page).toBe(1);
+  });
+
+  it('returns an empty page with total 0 for a user with no expenses (AC 8)', async () => {
+    const res = await get('/expenses', build('user-9'));
+    expect(res.json()).toEqual({ items: [], page: 1, pageSize: 20, total: 0 });
   });
 
   it.each(['0', 'abc', '-3', '1.5'])('treats page %s as page 1 (AC 3)', async (page) => {
@@ -225,6 +263,15 @@ describe('browse expenses API', () => {
 describe('parseListQuery', () => {
   it('defaults to no filters on page 1', () => {
     expect(parseListQuery({})).toEqual({ ok: true, value: { filters: {}, page: 1 } });
+  });
+  it('keeps a search containing wildcard characters as typed', () => {
+    expect(parseListQuery({ q: '100%_' })).toEqual({
+      ok: true,
+      value: { filters: { q: '100%_' }, page: 1 },
+    });
+  });
+  it('treats a non-object query as empty', () => {
+    expect(parseListQuery(undefined)).toEqual({ ok: true, value: { filters: {}, page: 1 } });
   });
   it('ignores an empty q', () => {
     expect(parseListQuery({ q: '  ' })).toEqual({ ok: true, value: { filters: {}, page: 1 } });

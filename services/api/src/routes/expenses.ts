@@ -1,10 +1,9 @@
 import type { FastifyPluginAsync, preHandlerAsyncHookHandler } from 'fastify';
 import type { CategoryStore } from '../stores/categories.js';
 import type { ExpenseStore } from '../stores/expenses.js';
-import { parseListQuery, validateExpenseInput } from '../validation/expense.js';
+import { parseListQuery, UUID, validateExpenseInput } from '../validation/expense.js';
 
 const PAGE_SIZE = 20;
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 type Deps = { expenses: ExpenseStore; categories: CategoryStore; today: () => string };
 

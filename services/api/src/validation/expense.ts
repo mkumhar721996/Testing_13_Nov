@@ -20,7 +20,10 @@ export type ListQuery = { filters: ExpenseFilters; page: number };
 
 export type ListQueryValidation =
   | { ok: true; value: ListQuery }
-  | { ok: false; errors: { dateRange: string } };
+  | { ok: false; errors: { dateRange?: string; category?: string } };
+
+/** Ids are uuid columns: a malformed one must never reach Postgres, which would throw. */
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const BAD_RANGE = 'The from date must be on or before the to date.';
 
@@ -31,7 +34,12 @@ export function parseListQuery(query: unknown): ListQueryValidation {
   const search = text(q.q);
   if (search) filters.q = search;
   const categoryId = text(q.categoryId);
-  if (categoryId) filters.categoryId = categoryId;
+  if (categoryId) {
+    if (!UUID.test(categoryId)) {
+      return { ok: false, errors: { category: 'Choose a category from the list.' } };
+    }
+    filters.categoryId = categoryId;
+  }
 
   for (const key of ['from', 'to'] as const) {
     const value = text(q[key]);

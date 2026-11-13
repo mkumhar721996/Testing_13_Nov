@@ -30,6 +30,7 @@ export default function TopBar() {
               key={s.id}
               href={`#${s.id}`}
               className="topnav-link"
+              onClick={(e) => e.preventDefault()}
               aria-current={s.id === 'dashboard' ? 'page' : undefined}
             >
               {s.label}

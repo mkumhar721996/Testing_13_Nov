@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ExpenseList from './ExpenseList'
 import * as api from './api'
@@ -128,8 +128,9 @@ describe('ExpenseList', () => {
     renderList()
     type('Search description', 'x')
     expect(await screen.findByText('Newer result')).toBeInTheDocument()
-    resolveOld(page([item(1, { description: 'Older result' })]))
-    await Promise.resolve()
+    await act(async () => {
+      resolveOld(page([item(1, { description: 'Older result' })]))
+    })
     expect(screen.queryByText('Older result')).not.toBeInTheDocument()
     expect(screen.getByText('Newer result')).toBeInTheDocument()
   })
@@ -160,6 +161,47 @@ describe('ExpenseList', () => {
     const { onOpen } = renderList()
     fireEvent.click(await screen.findByRole('button', { name: 'Expense 1' }))
     expect(onOpen).toHaveBeenCalledWith('id-1')
+  })
+
+  it('shows the right range on the last, partial page', async () => {
+    vi.mocked(api.listExpenses).mockResolvedValue(
+      page([item(21), item(22), item(23), item(24), item(25)], 25, 2),
+    )
+    renderList()
+    expect(await screen.findByText('Showing 21 to 25 of 25 expenses')).toBeInTheDocument()
+    expect(screen.getByText('Page 2 of 2')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Next/ })).toBeDisabled()
+  })
+
+  it('labels an expense without a description', async () => {
+    vi.mocked(api.listExpenses).mockResolvedValue(page([item(1, { description: null })]))
+    renderList()
+    expect(await screen.findByRole('button', { name: 'No description' })).toBeInTheDocument()
+  })
+
+  it('shows the clear-filters button only while a filter is active', async () => {
+    renderList()
+    await screen.findByRole('table')
+    expect(screen.queryByRole('button', { name: 'Clear filters' })).not.toBeInTheDocument()
+    type('Search description', 'x')
+    expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument()
+  })
+
+  it('allows a single-day range where from equals to', async () => {
+    renderList()
+    await screen.findByRole('table')
+    type('From date', '2026-11-15')
+    type('To date', '2026-11-15')
+    expect(screen.queryByText('The from date must be on or before the to date.')).not.toBeInTheDocument()
+    expect(lastCall()).toEqual({ ...noFilters, from: '2026-11-15', to: '2026-11-15' })
+  })
+
+  it('does not show a zero-result message while the first load fails', async () => {
+    vi.mocked(api.listExpenses).mockRejectedValue(new Error('boom'))
+    renderList()
+    await screen.findByRole('alert')
+    expect(screen.queryByRole('heading', { name: 'No expenses yet' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'No expenses match' })).not.toBeInTheDocument()
   })
 
   it('shows a loading state, then an error with retry', async () => {
