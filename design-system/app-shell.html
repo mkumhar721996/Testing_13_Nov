@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>App shell</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="prototype-utils.css">
+  <style>
+    .shell { display: flex; flex-direction: column; min-height: 100vh; max-width: 100%; overflow-x: clip; }
+    .shell-header { position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: var(--header-height); padding: var(--space-2) var(--space-3); border-bottom: var(--focus-ring-width) solid var(--color-accent); background: var(--color-primary); color: var(--color-on-primary); }
+    .shell-brand { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--control-height-lg, 3rem); min-width: var(--control-height-lg, 3rem); color: var(--color-on-primary); font-weight: var(--font-weight-bold); font-size: var(--font-size-lg); text-decoration: none; }
+    .shell-nav { display: none; flex-basis: 100%; }
+    .shell-nav:not([hidden]), .shell-nav.is-open { display: block; }
+    .shell-nav ul { display: flex; flex-direction: column; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+    .shell-menu-button { display: inline-flex; align-items: center; justify-content: center; min-width: var(--control-height-lg, 3rem); min-height: var(--control-height-lg, 3rem); }
+    .shell-nav a, .shell-footer a { display: inline-flex; align-items: center; min-height: var(--control-height-lg, 3rem); }
+    .shell-nav a { display: flex; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--color-on-primary); text-decoration: none; }
+    .shell-nav a:hover { background: var(--color-primary-hover); }
+    .shell-nav a[aria-current="page"] { background: var(--color-surface); color: var(--color-primary); font-weight: var(--font-weight-medium); }
+    .shell-brand:focus-visible, .shell-nav a:focus-visible { outline: var(--focus-ring-width) solid var(--color-on-primary); outline-offset: var(--focus-ring-offset); }
+    .shell-layout { flex: 1; width: 100%; max-width: var(--container-max); margin-inline: auto; padding: var(--space-4) var(--space-3); min-width: 0; }
+    .shell-content { min-width: 0; }
+    .shell-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-3); border-top: var(--border-width) solid var(--color-border); background: var(--color-bg-subtle); color: var(--color-fg-muted); font-size: var(--font-size-sm); }
+    .shell-footer a { min-width: var(--control-height-lg, 3rem); justify-content: center; }
+    .shell-footer nav ul { display: flex; flex-wrap: wrap; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+    @media (min-width: 48rem) {
+      .shell-menu-button { display: none; }
+      .shell-header { flex-wrap: nowrap; padding-inline: var(--space-4); }
+      .shell-nav, .shell-nav[hidden] { display: block !important; flex: 1; flex-basis: auto; }
+      .shell-nav ul { flex-direction: row; align-items: center; }
+      .shell-nav li:last-child { margin-left: auto; }
+      .shell-layout { padding-inline: var(--space-4); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" data-arc-shell>
+    <header class="shell-header" data-arc-shell-part="header">
+      <a class="shell-brand" href="#">Web App</a>
+      <button class="btn btn-secondary btn-icon shell-menu-button" type="button" data-toggle="main-nav" aria-controls="main-nav" aria-label="Menu">&#9776;</button>
+      <nav class="shell-nav" id="main-nav" aria-label="Main" data-arc-shell-part="nav" hidden>
+        <ul>
+          <li><a href="#" data-nav-key="dashboard">Dashboard</a></li>
+          <li><a href="#" data-nav-key="projects">Projects</a></li>
+          <li><a href="#" data-nav-key="reports">Reports</a></li>
+          <li><a href="#" data-nav-key="settings">Settings</a></li>
+          <li><a href="#" data-nav-key="account">Account</a></li>
+        </ul>
+      </nav>
+    </header>
+    <div class="shell-layout">
+      <main class="shell-content" data-arc-content></main>
+    </div>
+    <footer class="shell-footer" data-arc-shell-part="footer">
+      <span>&copy; Web App</span>
+      <nav aria-label="Footer">
+        <ul>
+          <li><a href="#">Help</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>
