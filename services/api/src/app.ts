@@ -3,12 +3,15 @@ import { noUser, requireUser, type ResolveUserId } from './auth.js';
 import { categoryRoutes } from './routes/categories.js';
 import { expenseRoutes } from './routes/expenses.js';
 import { healthRoutes } from './routes/health.js';
+import { organizationRoutes } from './routes/organizations.js';
+import { pgOrganizationStore, type OrganizationStore } from './stores/organizations.js';
 import { pgCategoryStore, type CategoryStore } from './stores/categories.js';
 import { pgExpenseStore, type ExpenseStore } from './stores/expenses.js';
 
 export type AppOptions = {
   resolveUserId?: ResolveUserId;
   expenses?: ExpenseStore;
+  organizations?: OrganizationStore;
   categories?: CategoryStore;
   /** Today as YYYY-MM-DD; defaults to the UTC date. */
   today?: () => string;
@@ -27,5 +30,7 @@ export function buildApp(opts: AppOptions = {}): FastifyInstance {
   app.register(healthRoutes);
   app.register(categoryRoutes(categories, auth));
   app.register(expenseRoutes({ expenses: opts.expenses ?? pgExpenseStore, categories, today }, auth));
+  // Not behind requireUser yet: see the open authentication question for the organization screen.
+  app.register(organizationRoutes({ organizations: opts.organizations ?? pgOrganizationStore }));
   return app;
 }
