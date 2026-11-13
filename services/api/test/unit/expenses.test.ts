@@ -1,14 +1,38 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { buildApp } from '../../src/app.js';
 import type { Category, CategoryStore } from '../../src/stores/categories.js';
-import type { Expense, ExpenseStore, NewExpense } from '../../src/stores/expenses.js';
-import { validateExpenseInput } from '../../src/validation/expense.js';
+import type {
+  Expense,
+  ExpenseFilters,
+  ExpensePage,
+  ExpenseStore,
+  ExpenseView,
+  NewExpense,
+} from '../../src/stores/expenses.js';
+import { parseListQuery, validateExpenseInput } from '../../src/validation/expense.js';
 
 class FakeExpenses implements ExpenseStore {
   created: (NewExpense & { userId: string })[] = [];
   async create(userId: string, input: NewExpense): Promise<Expense> {
     this.created.push({ userId, ...input });
     return { id: 'exp-1', userId, ...input };
+  }
+  listCalls: { userId: string; filters: ExpenseFilters; page: number }[] = [];
+  views: (ExpenseView & { userId: string })[] = [
+    { id: 'u1-a', userId: 'user-1', amount: '18.50', date: '2026-11-13', categoryId: 'cat-food', categoryName: 'Food', description: 'Lunch', createdAt: '2026-11-13T10:00:00.000Z' },
+    { id: 'u1-b', userId: 'user-1', amount: '9.00', date: '2026-11-01', categoryId: 'cat-travel', categoryName: 'Travel', description: null, createdAt: '2026-11-01T10:00:00.000Z' },
+    { id: 'u2-a', userId: 'user-2', amount: '5.00', date: '2026-11-02', categoryId: 'cat-work', categoryName: 'Work', description: 'Secret', createdAt: '2026-11-02T10:00:00.000Z' },
+  ];
+  async list(userId: string, filters: ExpenseFilters, page: number, pageSize: number): Promise<ExpensePage> {
+    this.listCalls.push({ userId, filters, page });
+    const own = this.views.filter((v) => v.userId === userId).map(({ userId: _u, ...v }) => v);
+    return { items: own, page, pageSize, total: own.length };
+  }
+  async get(userId: string, id: string) {
+    const v = this.views.find((x) => x.id === id && x.userId === userId);
+    if (!v) return undefined;
+    const { userId: _u, ...view } = v;
+    return view;
   }
 }
 
@@ -123,6 +147,134 @@ describe('expenses API', () => {
     expect(res.statusCode).toBe(400);
     expect(res.json().errors.category).toBe('Create a category first.');
     expect(store.created).toHaveLength(0);
+  });
+});
+
+describe('browse expenses API', () => {
+  let store: FakeExpenses;
+  const build = (user: string | null = 'user-1') =>
+    buildApp({
+      resolveUserId: async () => user ?? undefined,
+      expenses: store,
+      categories: new FakeCategories(rows),
+      today: () => '2026-11-13',
+    });
+  const get = (url: string, app = build()) => app.inject({ method: 'GET', url });
+  const UUID_OWN = '11111111-1111-4111-8111-111111111111';
+
+  beforeEach(() => {
+    store = new FakeExpenses();
+  });
+
+  it('lists only the signed-in user\'s expenses, ignoring a userId param (AC 1)', async () => {
+    const res = await get('/expenses?userId=user-2');
+    expect(res.statusCode).toBe(200);
+    expect(res.json().items.map((e: { id: string }) => e.id)).toEqual(['u1-a', 'u1-b']);
+    expect(res.json().total).toBe(2);
+    expect(res.json().pageSize).toBe(20);
+    expect(store.listCalls[0].userId).toBe('user-1');
+  });
+
+  it('requires a signed-in user', async () => {
+    expect((await get('/expenses', build(null))).statusCode).toBe(401);
+    expect((await get('/expenses/u1-a', build(null))).statusCode).toBe(401);
+  });
+
+  it('passes filters and page to the store (AC 4, 5, 6, 10)', async () => {
+    await get(`/expenses?q=%20lunch%20&categoryId=${UUID_OWN}&from=2026-11-10&to=2026-11-20&page=2`);
+    expect(store.listCalls[0]).toEqual({
+      userId: 'user-1',
+      filters: { q: 'lunch', categoryId: UUID_OWN, from: '2026-11-10', to: '2026-11-20' },
+      page: 2,
+    });
+  });
+
+  it.each(['abc', 'cat-food', '1; DROP TABLE expenses'])(
+    'rejects a non-uuid categoryId %j with 400 instead of reaching the database',
+    async (categoryId) => {
+      const res = await get(`/expenses?categoryId=${encodeURIComponent(categoryId)}`);
+      expect(res.statusCode).toBe(400);
+      expect(res.json().errors.category).toBeDefined();
+      expect(store.listCalls).toHaveLength(0);
+    },
+  );
+
+  it.each([
+    ['from=2026-02-30', 'an impossible date'],
+    ['to=2026-13-01', 'a month 13'],
+    ['from=2026-11-1', 'a short day'],
+  ])('rejects %s (%s)', async (qs) => {
+    expect((await get(`/expenses?${qs}`)).statusCode).toBe(400);
+  });
+
+  it('accepts a single-day range where from equals to', async () => {
+    const res = await get('/expenses?from=2026-11-15&to=2026-11-15');
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('accepts only a from date or only a to date', async () => {
+    expect((await get('/expenses?from=2026-11-15')).statusCode).toBe(200);
+    expect((await get('/expenses?to=2026-11-15')).statusCode).toBe(200);
+  });
+
+  it('falls back to page 1 for a repeated page param', async () => {
+    await get('/expenses?page=2&page=3');
+    expect(store.listCalls[0].page).toBe(1);
+  });
+
+  it('returns an empty page with total 0 for a user with no expenses (AC 8)', async () => {
+    const res = await get('/expenses', build('user-9'));
+    expect(res.json()).toEqual({ items: [], page: 1, pageSize: 20, total: 0 });
+  });
+
+  it.each(['0', 'abc', '-3', '1.5'])('treats page %s as page 1 (AC 3)', async (page) => {
+    await get(`/expenses?page=${page}`);
+    expect(store.listCalls[0].page).toBe(1);
+  });
+
+  it('rejects a from date after the to date (AC 6)', async () => {
+    const res = await get('/expenses?from=2026-11-20&to=2026-11-10');
+    expect(res.statusCode).toBe(400);
+    expect(res.json().errors.dateRange).toBe('The from date must be on or before the to date.');
+    expect((await get('/expenses?from=nope')).statusCode).toBe(400);
+  });
+
+  it('shows the detail of an own expense (AC 7)', async () => {
+    store.views[0].id = UUID_OWN;
+    const res = await get(`/expenses/${UUID_OWN}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toMatchObject({ amount: '18.50', date: '2026-11-13', categoryName: 'Food', description: 'Lunch' });
+  });
+
+  it('returns 404 for another user\'s expense without leaking it (AC 11)', async () => {
+    const other = '22222222-2222-4222-8222-222222222222';
+    store.views[2].id = other;
+    const res = await get(`/expenses/${other}`);
+    expect(res.statusCode).toBe(404);
+    expect(res.json()).toEqual({ error: 'not_found' });
+    expect(res.body).not.toContain('Secret');
+  });
+
+  it('returns 404 for an id that is not a uuid', async () => {
+    expect((await get('/expenses/not-a-uuid')).statusCode).toBe(404);
+  });
+});
+
+describe('parseListQuery', () => {
+  it('defaults to no filters on page 1', () => {
+    expect(parseListQuery({})).toEqual({ ok: true, value: { filters: {}, page: 1 } });
+  });
+  it('keeps a search containing wildcard characters as typed', () => {
+    expect(parseListQuery({ q: '100%_' })).toEqual({
+      ok: true,
+      value: { filters: { q: '100%_' }, page: 1 },
+    });
+  });
+  it('treats a non-object query as empty', () => {
+    expect(parseListQuery(undefined)).toEqual({ ok: true, value: { filters: {}, page: 1 } });
+  });
+  it('ignores an empty q', () => {
+    expect(parseListQuery({ q: '  ' })).toEqual({ ok: true, value: { filters: {}, page: 1 } });
   });
 });
 
