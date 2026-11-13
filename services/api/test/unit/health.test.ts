@@ -10,3 +10,15 @@ describe('GET /health', () => {
     await app.close();
   });
 });
+
+describe('buildApp without a session resolver', () => {
+  it('fails loudly in production', () => {
+    const prev = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      expect(() => buildApp()).toThrow(/session resolver/);
+    } finally {
+      process.env.NODE_ENV = prev;
+    }
+  });
+});
