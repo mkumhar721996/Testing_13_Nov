@@ -6,6 +6,7 @@ const SECTIONS = [
   { id: 'projects', label: 'Projects' },
   { id: 'reports', label: 'Reports' },
   { id: 'settings', label: 'Settings' },
+  { id: 'account', label: 'Account', className: 'topnav-account' },
 ]
 
 export default function TopBar() {
@@ -29,7 +30,7 @@ export default function TopBar() {
             <a
               key={s.id}
               href={`#${s.id}`}
-              className="topnav-link"
+              className={`topnav-link${s.className ? ` ${s.className}` : ''}`}
               onClick={(e) => e.preventDefault()}
               aria-current={s.id === 'dashboard' ? 'page' : undefined}
             >
