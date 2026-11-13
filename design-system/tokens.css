@@ -1,0 +1,105 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
+:root {
+  --color-fg: #111827; /** Primary text */
+  --color-fg-muted: #4b5563; /** Secondary text and hints */
+  --color-bg: #ffffff; /** Page background */
+  --color-bg-subtle: #eef2ff; /** Indigo-tinted hover fills, skeletons, footer */
+  --color-surface: #ffffff; /** Cards, modals, menus */
+  --color-primary: #1d4ed8; /** Brand and primary actions */
+  --color-primary-hover: #1e40af; /** Primary hover */
+  --color-on-primary: #ffffff; /** Text on primary and danger fills */
+  --color-border: #d1d5db; /** Dividers and card borders */
+  --color-border-strong: #6b7280; /** Form control borders */
+  --color-focus: #1d4ed8; /** Focus ring */
+  --color-danger: #b91c1c; /** Destructive and error */
+  --color-danger-hover: #991b1b;
+  --color-danger-bg: #fef2f2;
+  --color-success: #15803d;
+  --color-success-bg: #f0fdf4;
+  --color-warning: #92400e;
+  --color-warning-bg: #fffbeb;
+  --color-info: #1d4ed8;
+  --color-info-bg: #eff6ff;
+  --color-scrim: #000000; /** Backdrop colour, dimmed by opacity-scrim */
+  --color-accent: #7c3aed; /** Violet accent for highlights and featured items */
+  --color-accent-hover: #6d28d9;
+  --color-accent-bg: #f5f3ff;
+  --color-teal: #0f766e; /** Teal for secondary highlights and growth metrics */
+  --color-teal-bg: #f0fdfa;
+  --color-pink: #be185d; /** Pink for tags and categories */
+  --color-pink-bg: #fdf2f8;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --border-width: 1px;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --control-height-sm: 32px;
+  --control-height-md: 40px;
+  --control-height-lg: 48px;
+  --icon-size: 20px;
+  --switch-width: 40px;
+  --switch-height: 24px;
+  --avatar-size: 40px;
+  --spinner-size: 24px;
+  --drawer-width: 360px;
+  --modal-width: 480px;
+  --toast-width: 320px;
+  --menu-min-width: 192px;
+  --container-max: 1120px;
+  --header-height: 56px;
+  --font-family-base: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --opacity-scrim: 0.5;
+  --opacity-disabled: 0.5;
+  --z-dropdown: 20;
+  --z-drawer: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --duration-fast: [object Object];
+  --duration-spin: [object Object];
+  --button-primary-background: var(--color-primary);
+  --button-primary-background-hover: var(--color-primary-hover);
+  --button-primary-foreground: var(--color-on-primary);
+  --button-primary-border: var(--color-primary);
+  --button-secondary-background: var(--color-bg);
+  --button-secondary-background-hover: var(--color-bg-subtle);
+  --button-secondary-foreground: var(--color-fg);
+  --button-secondary-border: var(--color-border-strong);
+  --button-ghost-background: var(--color-bg);
+  --button-ghost-background-hover: var(--color-bg-subtle);
+  --button-ghost-foreground: var(--color-primary);
+  --button-ghost-border: var(--color-bg);
+  --button-danger-background: var(--color-danger);
+  --button-danger-background-hover: var(--color-danger-hover);
+  --button-danger-foreground: var(--color-on-primary);
+  --button-danger-border: var(--color-danger);
+  --button-default-radius: var(--radius-md);
+  --button-default-padding: var(--space-3);
+  --card-default-background: var(--color-surface);
+  --card-default-foreground: var(--color-fg);
+  --card-default-border: var(--color-border);
+  --card-default-radius: var(--radius-lg);
+  --card-default-padding: var(--space-3);
+  --card-accent-background: var(--color-accent-bg);
+  --card-accent-border: var(--color-accent);
+  --card-teal-background: var(--color-teal-bg);
+  --card-teal-border: var(--color-teal);
+}

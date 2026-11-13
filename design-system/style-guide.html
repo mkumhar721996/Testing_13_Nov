@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Style guide</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="prototype-utils.css">
+  <style>
+    .sg { max-width: var(--container-max); margin: 0 auto; padding: var(--space-4) var(--space-3); display: flex; flex-direction: column; gap: var(--space-5); }
+    .sg section { display: flex; flex-direction: column; gap: var(--space-3); }
+    .sg h2 { padding-bottom: var(--space-1); border-bottom: var(--border-width) solid var(--color-border); }
+    .sg h3 { color: var(--color-fg-muted); font-size: var(--font-size-sm); text-transform: uppercase; }
+    .sg code { font-size: var(--font-size-sm); }
+    .swatch { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--font-size-sm); }
+    .swatch-chip { height: var(--control-height-lg); border: var(--border-width) solid var(--color-border); border-radius: var(--radius-md); }
+    .bar { height: var(--space-3); background: var(--color-primary); border-radius: var(--radius-sm); }
+    .radius-box { height: var(--control-height-lg); border: var(--focus-ring-width) solid var(--color-primary); background: var(--color-info-bg); }
+    .stage { position: relative; transform: translateZ(0); height: calc(var(--drawer-width) + var(--space-4)); overflow: hidden; border: var(--border-width) dashed var(--color-border-strong); border-radius: var(--radius-md); }
+    .stage > .drawer, .stage > .modal, .stage > .toast, .stage > .backdrop { position: absolute; }
+    .stage > .backdrop { z-index: auto; }
+    .stage > .modal { z-index: 2; }
+    .stage > .toast { z-index: 3; }
+    .stage > .drawer { z-index: 1; }
+    .stage-menu { min-height: calc(var(--control-height-lg) * 4); }
+    .dropdown-menu.is-static { display: block; position: static; }
+    .sg .tooltip-text { position: static; display: inline-block; visibility: visible; opacity: 1; transform: none; }
+  </style>
+</head>
+<body>
+<div class="sg">
+  <header><h1>Style guide</h1><p class="text-muted">Tokens, utility classes, components in each state, and UI guidelines. Styled live from <code>tokens.css</code> and <code>prototype-utils.css</code>.</p></header>
+
+  <section id="colors"><h2>Color tokens</h2>
+    <div class="grid">
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-fg)"></div><code>color-fg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-fg-muted)"></div><code>color-fg-muted</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-bg)"></div><code>color-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-bg-subtle)"></div><code>color-bg-subtle</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-surface)"></div><code>color-surface</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-primary)"></div><code>color-primary</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-primary-hover)"></div><code>color-primary-hover</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-on-primary)"></div><code>color-on-primary</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-border)"></div><code>color-border</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-border-strong)"></div><code>color-border-strong</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-focus)"></div><code>color-focus</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-danger)"></div><code>color-danger</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-danger-hover)"></div><code>color-danger-hover</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-danger-bg)"></div><code>color-danger-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-success)"></div><code>color-success</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-success-bg)"></div><code>color-success-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-warning)"></div><code>color-warning</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-warning-bg)"></div><code>color-warning-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-info)"></div><code>color-info</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-info-bg)"></div><code>color-info-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-accent)"></div><code>color-accent</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-accent-hover)"></div><code>color-accent-hover</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-accent-bg)"></div><code>color-accent-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-teal)"></div><code>color-teal</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-teal-bg)"></div><code>color-teal-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-pink)"></div><code>color-pink</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-pink-bg)"></div><code>color-pink-bg</code></div>
+      <div class="swatch"><div class="swatch-chip" style="background:var(--color-scrim);opacity:var(--opacity-scrim)"></div><code>color-scrim</code></div>
+    </div>
+    <h3>Text pairs</h3>
+    <div class="grid">
+      <div class="p-3" style="background:var(--color-bg);color:var(--color-fg);border:var(--border-width) solid var(--color-border)"><code>color-fg</code> on <code>color-bg</code></div>
+      <div class="p-3" style="background:var(--color-bg);color:var(--color-fg-muted);border:var(--border-width) solid var(--color-border)"><code>color-fg-muted</code> on <code>color-bg</code></div>
+      <div class="p-3" style="background:var(--color-primary);color:var(--color-on-primary)"><code>color-on-primary</code> on <code>color-primary</code></div>
+    </div>
+  </section>
+
+  <section id="type"><h2>Typography tokens</h2>
+    <p style="font-size:var(--font-size-xl);font-weight:var(--font-weight-bold)"><code>font-size-xl</code> / <code>font-weight-bold</code> — The quick brown fox</p>
+    <p style="font-size:var(--font-size-lg);font-weight:var(--font-weight-medium)"><code>font-size-lg</code> / <code>font-weight-medium</code> — The quick brown fox</p>
+    <p style="font-size:var(--font-size-md);font-weight:var(--font-weight-regular)"><code>font-size-md</code> / <code>font-weight-regular</code> — The quick brown fox</p>
+    <p style="font-size:var(--font-size-sm)"><code>font-size-sm</code> — The quick brown fox</p>
+    <p class="text-muted text-sm"><code>font-family-base</code>, <code>line-height-base</code> apply to the whole page. Utilities: <code>.text-muted</code> <code>.text-sm</code> <code>.text-lg</code> <code>.text-bold</code>.</p>
+  </section>
+
+  <section id="space"><h2>Spacing, radius and other tokens</h2>
+    <h3>Spacing</h3>
+    <div class="stack stack-sm">
+      <div class="cluster"><code>space-1</code><div class="bar" style="width:var(--space-1)"></div></div>
+      <div class="cluster"><code>space-2</code><div class="bar" style="width:var(--space-2)"></div></div>
+      <div class="cluster"><code>space-3</code><div class="bar" style="width:var(--space-3)"></div></div>
+      <div class="cluster"><code>space-4</code><div class="bar" style="width:var(--space-4)"></div></div>
+      <div class="cluster"><code>space-5</code><div class="bar" style="width:var(--space-5)"></div></div>
+      <div class="cluster"><code>space-6</code><div class="bar" style="width:var(--space-6)"></div></div>
+    </div>
+    <h3>Radius</h3>
+    <div class="grid">
+      <div class="stack stack-sm"><div class="radius-box" style="border-radius:var(--radius-sm)"></div><code>radius-sm</code></div>
+      <div class="stack stack-sm"><div class="radius-box" style="border-radius:var(--radius-md)"></div><code>radius-md</code></div>
+      <div class="stack stack-sm"><div class="radius-box" style="border-radius:var(--radius-lg)"></div><code>radius-lg</code></div>
+      <div class="stack stack-sm"><div class="radius-box" style="border-radius:var(--radius-full)"></div><code>radius-full</code></div>
+    </div>
+    <h3>Sizing, motion and layering</h3>
+    <table class="table">
+      <tr><th>Token</th><th>Used for</th></tr>
+      <tr><td><code>border-width</code></td><td>All borders</td></tr>
+      <tr><td><code>focus-ring-width</code>, <code>focus-ring-offset</code>, <code>color-focus</code></td><td>Keyboard focus ring</td></tr>
+      <tr><td><code>control-height-sm</code> / <code>-md</code> / <code>-lg</code></td><td>Buttons, inputs, chips</td></tr>
+      <tr><td><code>icon-size</code>, <code>avatar-size</code>, <code>spinner-size</code>, <code>switch-width</code>, <code>switch-height</code></td><td>Icon-like elements</td></tr>
+      <tr><td><code>drawer-width</code>, <code>modal-width</code>, <code>toast-width</code>, <code>menu-min-width</code>, <code>container-max</code>, <code>header-height</code></td><td>Overlay and page widths</td></tr>
+      <tr><td><code>opacity-scrim</code>, <code>opacity-disabled</code></td><td>Backdrop and disabled states</td></tr>
+      <tr><td><code>duration-fast</code>, <code>duration-spin</code></td><td>Transitions and loaders</td></tr>
+      <tr><td><code>z-dropdown</code>, <code>z-drawer</code>, <code>z-modal</code>, <code>z-toast</code></td><td>Layer order</td></tr>
+      <tr><td><code>button-*</code>, <code>card-default-*</code></td><td>Component aliases (e.g. <code>button-primary-background</code>)</td></tr>
+    </table>
+  </section>
+
+  <section id="layout"><h2>Layout helpers</h2>
+    <div class="stack stack-sm"><div class="card p-2">.stack</div><div class="card p-2">children spaced by space-3</div></div>
+    <div class="cluster"><span class="badge">.cluster</span><span class="badge">wraps</span><span class="badge">inline</span></div>
+    <div class="grid"><div class="card">.grid</div><div class="card">auto-fills</div><div class="card">columns</div></div>
+    <p class="text-sm text-muted">Variants: <code>.stack-sm</code> <code>.stack-lg</code> <code>.cluster-lg</code> <code>.grid-lg</code> <code>.container</code> <code>.p-1…p-4</code> <code>.m-0</code> <code>.visually-hidden</code> <code>.table</code></p>
+  </section>
+
+  <section id="buttons"><h2>Buttons</h2>
+    <div class="cluster"><button class="btn btn-primary">Primary</button><button class="btn btn-secondary">Secondary</button><button class="btn btn-ghost">Ghost</button><button class="btn btn-danger">Danger</button><button class="btn">Default</button></div>
+    <h3>Sizes and icon</h3>
+    <div class="cluster"><button class="btn btn-primary btn-sm">Small</button><button class="btn btn-primary">Medium</button><button class="btn btn-primary btn-lg">Large</button><button class="btn btn-secondary btn-icon" aria-label="Add">+</button><button class="btn btn-secondary btn-icon btn-sm" aria-label="Add">+</button><button class="btn btn-secondary btn-icon btn-lg" aria-label="Add">+</button></div>
+    <h3>Disabled</h3>
+    <div class="cluster"><button class="btn btn-primary" disabled>Primary</button><button class="btn btn-secondary" disabled>Secondary</button><button class="btn btn-ghost" disabled>Ghost</button><button class="btn btn-danger" disabled>Danger</button></div>
+    <p class="text-sm text-muted">Focus: press Tab to see the <code>:focus-visible</code> ring on any control.</p>
+  </section>
+
+  <section id="forms"><h2>Form controls</h2>
+    <div class="grid grid-lg">
+      <div class="field"><label for="f1">Name</label><input class="input" id="f1" placeholder="Project name"><span class="field-hint">Shown in lists.</span></div>
+      <div class="field"><label for="f2">Email (error)</label><input class="input is-invalid" id="f2" value="not-an-email" aria-invalid="true"><span class="field-error">Enter an email like name@company.com.</span></div>
+      <div class="field"><label for="f3">Disabled</label><input class="input" id="f3" value="Read only" disabled></div>
+      <div class="field"><label for="f4">Notes</label><textarea class="textarea" id="f4"></textarea></div>
+      <div class="field"><label for="f5">Select</label><select class="select" id="f5"><option>Option one</option><option>Option two</option></select></div>
+      <div class="field"><label for="f6">Select (error)</label><select class="select is-invalid" id="f6"><option>Choose…</option></select><span class="field-error">Choose a value.</span></div>
+      <div class="field"><label for="f7">Select (disabled)</label><select class="select" id="f7" disabled><option>Locked</option></select></div>
+      <div class="field"><label for="f8">Textarea (disabled)</label><textarea class="textarea" id="f8" disabled></textarea></div>
+    </div>
+    <div class="cluster cluster-lg">
+      <label class="check-row"><input class="checkbox" type="checkbox"> Unchecked</label>
+      <label class="check-row"><input class="checkbox" type="checkbox" checked> Checked</label>
+      <label class="check-row"><input class="checkbox" type="checkbox" disabled> Disabled</label>
+      <label class="check-row"><input class="radio" type="radio" name="r"> Radio</label>
+      <label class="check-row"><input class="radio" type="radio" name="r" checked> Selected</label>
+      <label class="check-row"><input class="radio" type="radio" name="r2" disabled> Disabled</label>
+      <label class="check-row"><input class="switch" type="checkbox" role="switch"> Off</label>
+      <label class="check-row"><input class="switch" type="checkbox" role="switch" checked> On</label>
+      <label class="check-row"><input class="switch" type="checkbox" role="switch" disabled> Disabled</label>
+    </div>
+  </section>
+
+  <section id="menus"><h2>Dropdown and menu</h2>
+    <div class="stage stage-menu" style="height:auto;overflow:visible;padding:var(--space-3)">
+      <div class="cluster" style="align-items:flex-start">
+        <div class="dropdown" data-menu>
+          <button class="btn btn-secondary" type="button" aria-haspopup="true">Closed dropdown</button>
+          <div class="dropdown-menu" hidden role="menu"><button class="dropdown-item" role="menuitemradio" aria-checked="true">Newest</button><button class="dropdown-item" role="menuitemradio" aria-checked="false">Oldest</button></div>
+        </div>
+        <div class="dropdown">
+          <button class="btn btn-secondary" type="button" aria-haspopup="true" aria-expanded="true">Open dropdown</button>
+          <div class="dropdown-menu is-open" role="menu"><button class="dropdown-item" role="menuitemradio" aria-checked="true">Checked item</button><button class="dropdown-item" role="menuitemradio" aria-checked="false">Item</button><button class="dropdown-item" role="menuitem">Another item</button></div>
+        </div>
+      </div>
+      <div style="height:calc(var(--control-height-lg) * 2)"></div>
+    </div>
+    <h3>Menu list</h3>
+    <ul class="menu card" style="max-width:var(--menu-min-width)"><li><a href="#" aria-current="page">Current page</a></li><li><a href="#">Link</a></li><li><button type="button">Action</button></li></ul>
+  </section>
+
+  <section id="tabs"><h2>Tabs, accordion, disclosure</h2>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true">Selected</button><button class="tab" role="tab" aria-selected="false">Tab</button><button class="tab" role="tab" aria-selected="false" disabled>Disabled</button></div>
+    <div class="accordion">
+      <div><button class="disclosure" aria-expanded="true">Expanded section</button><div class="disclosure-panel">Panel content for the open section.</div></div>
+      <div><button class="disclosure" aria-expanded="false">Collapsed section</button></div>
+      <details><summary class="disclosure">Native details</summary><div class="disclosure-panel">Opens without script.</div></details>
+    </div>
+  </section>
+
+  <section id="surfaces"><h2>Card, badge, chip, avatar, divider</h2>
+    <div class="grid"><div class="card stack stack-sm"><h3 style="text-transform:none;color:var(--color-fg);font-size:var(--font-size-md)">Card title</h3><p class="text-muted">Card body text.</p><div class="cluster"><button class="btn btn-primary btn-sm">Action</button></div></div></div>
+    <div class="grid"><div class="card card-accent"><b class="text-accent">.card-accent</b><p class="text-muted">Featured item</p></div><div class="card card-teal"><b class="text-teal">.card-teal</b><p class="text-muted">Positive highlight</p></div></div>
+    <div class="cluster"><span class="badge badge-neutral">Neutral</span><span class="badge badge-success">Success</span><span class="badge badge-warning">Warning</span><span class="badge badge-danger">Danger</span><span class="badge badge-accent">Accent</span><span class="badge badge-teal">Teal</span><span class="badge badge-pink">Pink</span></div>
+    <p class="text-sm"><span class="text-accent">.text-accent</span> · <span class="text-teal">.text-teal</span> · <span class="text-pink">.text-pink</span></p>
+    <div class="cluster"><button class="chip">Default</button><button class="chip" aria-pressed="true">Selected</button><button class="chip is-selected">.is-selected</button></div>
+    <div class="cluster"><span class="avatar">AB</span><span class="avatar avatar-teal">CD</span><span class="avatar avatar-pink">EF</span></div>
+    <hr class="divider">
+  </section>
+
+  <section id="overlays"><h2>Overlays</h2>
+    <p class="text-sm text-muted">Each is shown open inside a frame. In use they are hidden by default and open with <code>[hidden]</code> removed or <code>.is-open</code> added.</p>
+    <h3>Drawer (right)</h3>
+    <div class="stage"><div class="drawer is-open"><div class="stack"><h2>Edit project</h2><div class="field"><label for="d1">Name</label><input class="input" id="d1"></div><div class="cluster"><button class="btn btn-primary">Save</button><button class="btn btn-ghost">Cancel</button></div></div></div></div>
+    <h3>Modal with backdrop</h3>
+    <div class="stage"><div class="backdrop is-open"></div><div class="modal is-open" role="dialog" aria-label="Delete project"><div class="stack"><h2>Delete project?</h2><p class="text-muted">This cannot be undone.</p><div class="cluster"><button class="btn btn-danger">Delete</button><button class="btn btn-secondary">Cancel</button></div></div></div></div>
+    <h3>Toast</h3>
+    <div class="stage" style="height:calc(var(--control-height-lg) * 2)"><div class="toast is-open" role="status">Project created.</div></div>
+    <h3>Tooltip</h3>
+    <div class="cluster"><span class="tooltip"><button class="btn btn-secondary">Hover or focus me</button><span class="tooltip-text" role="tooltip">Helpful hint</span></span><span class="tooltip-text">Open state</span></div>
+  </section>
+
+  <section id="feedback"><h2>Feedback</h2>
+    <div class="stack stack-sm">
+      <div class="alert alert-info" role="status">Info: a new version is available.</div>
+      <div class="alert alert-success" role="status">Success: changes saved.</div>
+      <div class="alert alert-warning" role="alert">Warning: your plan is nearly full.</div>
+      <div class="alert alert-danger" role="alert">Danger: the export failed. Try again.</div>
+    </div>
+    <div class="empty-state"><h3>No projects yet</h3><p>Create a project to start tracking work.</p><button class="btn btn-primary">Create project</button></div>
+    <div class="grid"><div class="stack stack-sm"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton" style="width:60%"></span></div><div class="cluster"><span class="spinner" role="status" aria-label="Loading"></span><span class="text-muted">Loading…</span></div></div>
+  </section>
+
+  <section id="guidelines"><h2>UI guidelines</h2>
+    <div class="stack">
+      <h3 style="text-transform:none;font-size:var(--font-size-lg);color:var(--color-fg)">Navigation and information architecture</h3>
+      <ul class="stack stack-sm">
+        <li>Use a single top bar with the main navigation inside it; there is no sidebar, so every screen keeps its full width for content.</li>
+        <li>Main sections, in order: <strong>Dashboard</strong> (<code>dashboard</code>), <strong>Projects</strong> (<code>projects</code>), <strong>Reports</strong> (<code>reports</code>), <strong>Settings</strong> (<code>settings</code>). Four peers keep the bar readable on a phone menu.</li>
+        <li><strong>Account</strong> (<code>account</code>) sits at the right end of the top bar, because it is personal rather than a work section.</li>
+        <li>On small screens the navigation collapses behind a menu button, so the page title stays visible.</li>
+        <li>Detail screens live under their section and show a back link, never a new top-level item, so the section list stays stable.</li>
+      </ul>
+      <h3 style="text-transform:none;font-size:var(--font-size-lg);color:var(--color-fg)">Layout and density</h3>
+      <ul class="stack stack-sm">
+        <li>Moderately dense working app: content sits in a <code>.container</code> and uses <code>.stack</code> / <code>.grid</code> with the default spacing tokens, since users scan lists and status all day.</li>
+        <li>Design mobile-first at 375px and expand to a single content column up to <code>container-max</code>; wider screens add columns via <code>.grid</code>, not wider text.</li>
+        <li>One primary action per screen, placed at the top right of the page header, so the next step is always in the same place.</li>
+      </ul>
+      <h3 style="text-transform:none;font-size:var(--font-size-lg);color:var(--color-fg)">Component usage</h3>
+      <ul class="stack stack-sm">
+        <li><code>.card</code> for a self-contained object with its own actions (a project, a summary figure); a <code>.table</code> for comparing many records across the same fields; a <code>.menu</code> list for short navigational or settings lists.</li>
+        <li><code>.btn-primary</code> for the single main action, <code>.btn-secondary</code> for alternatives, <code>.btn-ghost</code> for low-emphasis actions, <code>.btn-danger</code> only for destructive confirmation, so emphasis matches consequence.</li>
+        <li><code>.modal</code> for confirmations and short forms; <code>.drawer</code> for editing or inspecting a record without leaving the list; <code>.toast</code> for success after an action, <code>.alert</code> for problems that stay on the page.</li>
+        <li><code>.field</code> wraps every form control, with <code>.field-hint</code> for guidance and <code>.field-error</code> plus <code>.is-invalid</code> for errors, so labels and messages are consistent.</li>
+        <li><code>.empty-state</code> with one <code>.btn-primary</code> for first-use lists and <code>.skeleton</code> for loading lists; <code>.spinner</code> only for in-button or short waits, because skeletons keep the layout stable.</li>
+        <li><code>.badge</code> for status (success, warning, danger, neutral) and <code>.chip</code> for filters, to separate state from user-chosen filtering.</li>
+      </ul>
+      <h3 style="text-transform:none;font-size:var(--font-size-lg);color:var(--color-fg)">Theme</h3>
+      <ul class="stack stack-sm"><li>Light theme only, as the default and sole theme; the token set has no dark values, and a second theme would need its own review.</li>
+        <li>Colourful but purposeful: <code>color-primary</code> for the top bar, page titles and main actions; <code>color-accent</code> for featured items, selected chips and avatars; <code>color-teal</code> for positive highlights and growth figures; <code>color-pink</code> for tags and categories, so colour groups content by meaning rather than decorating it.</li>
+        <li>Use <code>.card-accent</code> / <code>.card-teal</code> and <code>.badge-accent</code> / <code>.badge-teal</code> / <code>.badge-pink</code> for emphasis, at most one tinted card per row, so the page stays calm enough to scan.</li>
+        <li>Status colours (<code>color-success</code>, <code>color-warning</code>, <code>color-danger</code>) stay reserved for status, so they are never confused with decoration.</li></ul>
+      <h3 style="text-transform:none;font-size:var(--font-size-lg);color:var(--color-fg)">Voice and tone</h3>
+      <ul class="stack stack-sm">
+        <li>Plain, calm and direct: short sentences, sentence case, verbs on buttons ("Create project", not "Submit"), because users are mid-task.</li>
+        <li>Errors say what happened and how to fix it, without blame or exclamation marks, so users recover quickly.</li>
+        <li>Empty states explain the benefit and offer the first step, so a blank screen never feels like a dead end.</li>
+      </ul>
+    </div>
+  </section>
+</div>
+</body>
+</html>
