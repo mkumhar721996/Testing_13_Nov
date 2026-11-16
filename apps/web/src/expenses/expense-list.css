@@ -1,0 +1,125 @@
+.list-wrap {
+  padding-block: var(--space-4) var(--space-6);
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.page-lead,
+.result-meta {
+  color: var(--color-fg-muted);
+}
+
+.result-meta {
+  font-size: var(--font-size-sm);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-date {
+  white-space: nowrap;
+  color: var(--color-fg-muted);
+}
+
+.row-link {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  height: auto;
+  min-height: var(--control-height-md);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.skel-row {
+  height: var(--control-height-lg);
+}
+
+.detail-card {
+  max-width: 520px;
+}
+
+.detail-amount {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+dl.detail {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+}
+
+dl.detail dt {
+  color: var(--color-fg-muted);
+}
+
+dl.detail dd {
+  margin: 0;
+  color: var(--color-fg);
+}
+
+@media (max-width: 599px) {
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'desc amt'
+      'date cat';
+    gap: var(--space-1) var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .cell-desc {
+    grid-area: desc;
+  }
+
+  .cell-amt {
+    grid-area: amt;
+  }
+
+  .cell-date {
+    grid-area: date;
+  }
+
+  .cell-cat {
+    grid-area: cat;
+    text-align: right;
+  }
+}

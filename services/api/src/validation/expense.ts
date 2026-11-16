@@ -1,4 +1,4 @@
-import type { NewExpense } from '../stores/expenses.js';
+import type { ExpenseFilters, NewExpense } from '../stores/expenses.js';
 
 export type ExpenseErrors = { amount?: string; date?: string; category?: string };
 
@@ -14,6 +14,45 @@ function validDate(s: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
   const d = new Date(`${s}T00:00:00Z`);
   return !Number.isNaN(d.getTime()) && d.toISOString().startsWith(s);
+}
+
+export type ListQuery = { filters: ExpenseFilters; page: number };
+
+export type ListQueryValidation =
+  | { ok: true; value: ListQuery }
+  | { ok: false; errors: { dateRange?: string; category?: string } };
+
+/** Ids are uuid columns: a malformed one must never reach Postgres, which would throw. */
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const BAD_RANGE = 'The from date must be on or before the to date.';
+
+/** Parses the GET /expenses query string. A bad page falls back to 1; a bad date range is rejected. */
+export function parseListQuery(query: unknown): ListQueryValidation {
+  const q = (query && typeof query === 'object' ? query : {}) as Record<string, unknown>;
+  const filters: ExpenseFilters = {};
+  const search = text(q.q);
+  if (search) filters.q = search;
+  const categoryId = text(q.categoryId);
+  if (categoryId) {
+    if (!UUID.test(categoryId)) {
+      return { ok: false, errors: { category: 'Choose a category from the list.' } };
+    }
+    filters.categoryId = categoryId;
+  }
+
+  for (const key of ['from', 'to'] as const) {
+    const value = text(q[key]);
+    if (!value) continue;
+    if (!validDate(value)) return { ok: false, errors: { dateRange: BAD_RANGE } };
+    filters[key] = value;
+  }
+  if (filters.from && filters.to && filters.from > filters.to) {
+    return { ok: false, errors: { dateRange: BAD_RANGE } };
+  }
+
+  const n = Number(text(q.page));
+  return { ok: true, value: { filters, page: Number.isInteger(n) && n >= 1 ? n : 1 } };
 }
 
 /** Validates an add-expense body. `today` is YYYY-MM-DD. Any other key (e.g. currency) is ignored. */

@@ -1,0 +1,11 @@
+svg.icon { width: 1.25em; height: 1.25em; flex-shrink: 0; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.header-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.main-row { display: grid; gap: var(--space-3); grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 64rem) { .main-row { grid-template-columns: minmax(0, 1fr) var(--drawer-width); } }
+.state-title { display: flex; align-items: center; gap: var(--space-2); }
+.skeleton-stat { height: calc(var(--control-height-lg) * 3); border-radius: var(--radius-lg); }
+.skeleton-chart { height: calc(var(--control-height-lg) * 6); border-radius: var(--radius-lg); }
+.alert-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); flex: 1; min-width: 0; }
+.alert-body { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.alert .icon { flex: none; margin-top: var(--space-1); }
+.failed { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
