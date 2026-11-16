@@ -4,6 +4,8 @@ import ExpenseDetail from './expenses/ExpenseDetail'
 import TopBar from './TopBar'
 import ExpenseList, { emptyQuery } from './expenses/ExpenseList'
 
+import MarketOverview from './market/MarketOverview'
+
 type View = { view: 'list' } | { view: 'detail'; id: string } | { view: 'add' }
 
 export default function App() {
@@ -16,6 +18,7 @@ export default function App() {
     <>
       <TopBar />
       <main>
+      {current.view === 'list' && <MarketOverview />}
       {current.view === 'list' && (
         <ExpenseList
           initialQuery={query}

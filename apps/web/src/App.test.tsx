@@ -24,6 +24,11 @@ vi.mock('./expenses/api', () => ({
   ExpenseRejectedError: class extends Error {},
 }))
 
+vi.mock('./market/api', () => ({
+  getWatchlist: vi.fn().mockResolvedValue([]),
+  getOverview: vi.fn().mockReturnValue(new Promise(() => {})),
+}))
+
 describe('App', () => {
   it('starts on the expense list', async () => {
     render(<App />)
