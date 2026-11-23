@@ -27,6 +27,7 @@ vi.mock('./expenses/api', () => ({
 vi.mock('./market/api', () => ({
   getWatchlist: vi.fn().mockResolvedValue([]),
   getOverview: vi.fn().mockReturnValue(new Promise(() => {})),
+  getMovers: vi.fn().mockReturnValue(new Promise(() => {})),
 }))
 
 describe('App', () => {

@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { getOverview, getWatchlist } from './api'
+import { getMovers, getOverview, getWatchlist } from './api'
 import MarketOverview from './MarketOverview'
 import { overview } from './testData'
 
-vi.mock('./api', () => ({ getOverview: vi.fn(), getWatchlist: vi.fn() }))
+vi.mock('./api', () => ({ getOverview: vi.fn(), getWatchlist: vi.fn(), getMovers: vi.fn() }))
 
 const watchlist = [
   { symbol: 'AAPL', name: 'Apple' },
@@ -14,6 +14,33 @@ beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(getWatchlist).mockResolvedValue(watchlist)
   vi.mocked(getOverview).mockImplementation(async (range, symbol) => overview({}, range, symbol ?? undefined))
+  vi.mocked(getMovers).mockResolvedValue({ gainers: [], losers: [] })
+})
+
+describe('MarketOverview movers', () => {
+  it('shows the movers card once data is ready', async () => {
+    render(<MarketOverview />)
+    expect(await screen.findByRole('heading', { name: 'Top movers today' })).toBeInTheDocument()
+  })
+
+  it('hides the movers card when there is no market data or everything failed', async () => {
+    const o = overview()
+    vi.mocked(getOverview).mockResolvedValueOnce({
+      ...o,
+      symbol: null,
+      indices: o.indices.map((i) => ({ ...i, level: null, points: [] })),
+    })
+    const { unmount } = render(<MarketOverview />)
+    await screen.findByRole('heading', { name: 'No market data yet' })
+    expect(screen.queryByRole('heading', { name: 'Top movers today' })).not.toBeInTheDocument()
+    unmount()
+
+    vi.mocked(getWatchlist).mockRejectedValueOnce(new Error('down'))
+    vi.mocked(getOverview).mockRejectedValueOnce(new Error('down'))
+    render(<MarketOverview />)
+    await screen.findByRole('heading', { name: 'Quotes are unavailable right now' })
+    expect(screen.queryByRole('heading', { name: 'Top movers today' })).not.toBeInTheDocument()
+  })
 })
 
 describe('MarketOverview', () => {

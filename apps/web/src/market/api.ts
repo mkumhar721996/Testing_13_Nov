@@ -18,6 +18,15 @@ export type OverviewResponse = {
   }[]
 }
 
+export type Mover = { symbol: string; name: string; price: number; changePct: number }
+export type MoversResponse = { gainers: Mover[]; losers: Mover[] }
+
+export async function getMovers(): Promise<MoversResponse> {
+  const res = await fetch('/market/movers')
+  if (!res.ok) throw new Error('Could not load movers')
+  return res.json()
+}
+
 export async function getWatchlist(): Promise<WatchlistItem[]> {
   const res = await fetch('/watchlist')
   if (!res.ok) throw new Error('Could not load watchlist')
