@@ -9,6 +9,7 @@ import {
   TotalFailureState,
 } from './DashboardStates'
 import IndexStatCard from './IndexStatCard'
+import MarketMovers from './MarketMovers'
 import PriceChart from './PriceChart'
 import { useDashboardData } from './useDashboardData'
 import './market.css'
@@ -102,11 +103,17 @@ export default function MarketOverview() {
       {status === 'loading' && <LoadingState />}
       {status === 'no-data' && <NoMarketDataState onRefresh={refresh} />}
       {status === 'error' && <TotalFailureState onRetry={refresh} />}
-      {status === 'ready' && sections}
+      {status === 'ready' && (
+        <>
+          {sections}
+          <MarketMovers />
+        </>
+      )}
       {status === 'partial' && (
         <>
           <PartialFailureBanner failed={failed} onRetryAll={refresh} />
           {sections}
+          <MarketMovers />
           {failed.map((section) => (
             <FailedSectionCard key={section} section={section} onReload={retry} />
           ))}

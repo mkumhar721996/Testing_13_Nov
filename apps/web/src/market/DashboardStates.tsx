@@ -1,5 +1,6 @@
 import type { Section } from './useDashboardData'
 import './dashboard-states.css'
+import './movers.css'
 
 function Icon({ id }: { id: 'loader' | 'alert' }) {
   return (
@@ -52,6 +53,10 @@ export function LoadingState() {
       <div className="main-row">
         <div className="skeleton skeleton-stat" />
         <div className="skeleton skeleton-chart" />
+      </div>
+      <div className="movers-grid">
+        <div className="skeleton skeleton-movers" />
+        <div className="skeleton skeleton-movers" />
       </div>
     </div>
   )
@@ -113,7 +118,7 @@ export function TotalFailureState({ onRetry }: { onRetry: () => void }) {
       </div>
       <div className="empty-state">
         <h3 className="m-0">Quotes are unavailable right now</h3>
-        <p className="m-0">The range, index stats and chart will return once the data loads.</p>
+        <p className="m-0">The range, index stats and chart and movers will return once the data loads.</p>
         <button type="button" className="btn btn-primary" onClick={onRetry}>
           <Icon id="loader" /> Try again
         </button>
