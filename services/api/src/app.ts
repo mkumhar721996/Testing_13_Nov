@@ -4,7 +4,9 @@ import { categoryRoutes } from './routes/categories.js';
 import { expenseRoutes } from './routes/expenses.js';
 import { healthRoutes } from './routes/health.js';
 import { marketRoutes } from './routes/market.js';
+import { moverRoutes } from './routes/movers.js';
 import { watchlistRoutes } from './routes/watchlist.js';
+import { pgMoverStore, type MoverStore } from './stores/movers.js';
 import { pgMarketStore, type MarketStore } from './stores/market.js';
 import { pgWatchlistStore, type WatchlistStore } from './stores/watchlist.js';
 import { pgCategoryStore, type CategoryStore } from './stores/categories.js';
@@ -16,6 +18,7 @@ export type AppOptions = {
   categories?: CategoryStore;
   market?: MarketStore;
   watchlist?: WatchlistStore;
+  movers?: MoverStore;
   now?: () => Date;
   /** Today as YYYY-MM-DD; defaults to the UTC date. */
   today?: () => string;
@@ -36,11 +39,8 @@ export function buildApp(opts: AppOptions = {}): FastifyInstance {
   app.register(expenseRoutes({ expenses: opts.expenses ?? pgExpenseStore, categories, today }, auth));
   const watchlist = opts.watchlist ?? pgWatchlistStore;
   app.register(watchlistRoutes(watchlist, auth));
-  app.register(
-    marketRoutes(
-      { market: opts.market ?? pgMarketStore, watchlist, now: opts.now ?? (() => new Date()) },
-      auth,
-    ),
-  );
+  const now = opts.now ?? (() => new Date());
+  app.register(marketRoutes({ market: opts.market ?? pgMarketStore, watchlist, now }, auth));
+  app.register(moverRoutes({ movers: opts.movers ?? pgMoverStore, now }, auth));
   return app;
 }

@@ -1,8 +1,17 @@
 import { useEffect, useId, useState } from 'react'
-import { getWatchlist, type IndexKey, type RangeKey, type WatchlistItem } from './api'
+import type { IndexKey, RangeKey } from './api'
+import {
+  FailedSectionCard,
+  Icon,
+  LoadingState,
+  NoMarketDataState,
+  PartialFailureBanner,
+  TotalFailureState,
+} from './DashboardStates'
 import IndexStatCard from './IndexStatCard'
+import MarketMovers from './MarketMovers'
 import PriceChart from './PriceChart'
-import { useMarketOverview } from './useMarketOverview'
+import { useDashboardData } from './useDashboardData'
 import './market.css'
 
 const RANGES: { id: RangeKey; label: string }[] = [
@@ -17,23 +26,17 @@ const ALL_VISIBLE: Record<IndexKey, boolean> = { spx: true, ndx: true, dji: true
 const INDEX_NAMES: Record<IndexKey, string> = { spx: 'S&P 500', ndx: 'Nasdaq', dji: 'Dow', vix: 'VIX' }
 
 export default function MarketOverview() {
-  const [watchlist, setWatchlist] = useState<WatchlistItem[] | undefined>()
-
-  useEffect(() => {
-    // A failed watchlist load leaves the chart without a symbol; error states are a separate story.
-    getWatchlist().then(setWatchlist, () => setWatchlist([]))
-  }, [])
-
-  return watchlist ? <Overview watchlist={watchlist} /> : null
-}
-
-function Overview({ watchlist }: { watchlist: WatchlistItem[] }) {
   const rangeId = useId()
   const [range, setRange] = useState<RangeKey>('1D')
-  const [symbol, setSymbol] = useState<string | null>(watchlist[0]?.symbol ?? null)
+  const [symbol, setSymbol] = useState<string | null>(null)
   const [visible, setVisible] = useState(ALL_VISIBLE)
   const [announcement, setAnnouncement] = useState('')
-  const { data } = useMarketOverview(range, symbol)
+  const { status, failed, watchlist, overview: data, refresh, retry } = useDashboardData(range, symbol)
+
+  useEffect(() => {
+    if (status === 'loading') setAnnouncement('Loading market data')
+    else setAnnouncement((a) => (a === 'Loading market data' ? 'Market data updated' : a))
+  }, [status])
 
   const labelFor = (id: RangeKey) => RANGES.find((r) => r.id === id)!.label
 
@@ -50,45 +53,70 @@ function Overview({ watchlist }: { watchlist: WatchlistItem[] }) {
     setAnnouncement(`${INDEX_NAMES[id]} ${visible[id] ? 'hidden' : 'shown'} on the chart.`)
   }
 
+  const sections = data && (
+    <>
+      <div className="grid">
+        {data.indices.map((index) => (
+          <IndexStatCard key={index.key} index={index} rangeLabel={labelFor(data.range)} />
+        ))}
+      </div>
+      <PriceChart
+        data={data}
+        rangeLabel={labelFor(data.range)}
+        watchlist={watchlist ?? []}
+        visible={visible}
+        onSymbolChange={changeSymbol}
+        onToggle={toggle}
+      />
+    </>
+  )
+
   return (
     <div className="overview">
       <div className="page-header">
         <h1>Market overview</h1>
-        <div className="range-field">
-          <label htmlFor={rangeId}>Range</label>
-          <select
-            id={rangeId}
-            className="select"
-            value={range}
-            onChange={(e) => changeRange(e.target.value as RangeKey)}
-          >
-            {RANGES.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.id}
-              </option>
-            ))}
-          </select>
+        <div className="header-actions">
+          <div className="range-field">
+            <label htmlFor={rangeId}>Range</label>
+            <select
+              id={rangeId}
+              className="select"
+              value={range}
+              onChange={(e) => changeRange(e.target.value as RangeKey)}
+            >
+              {RANGES.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.id}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button type="button" className="btn btn-primary" disabled={status === 'loading'} onClick={refresh}>
+            <Icon id="loader" /> Refresh
+          </button>
         </div>
       </div>
       <p className="visually-hidden" role="status" aria-live="polite">
         {announcement}
       </p>
 
-      {data && (
+      {status === 'loading' && <LoadingState />}
+      {status === 'no-data' && <NoMarketDataState onRefresh={refresh} />}
+      {status === 'error' && <TotalFailureState onRetry={refresh} />}
+      {status === 'ready' && (
         <>
-          <div className="grid">
-            {data.indices.map((index) => (
-              <IndexStatCard key={index.key} index={index} rangeLabel={labelFor(data.range)} />
-            ))}
-          </div>
-          <PriceChart
-            data={data}
-            rangeLabel={labelFor(data.range)}
-            watchlist={watchlist}
-            visible={visible}
-            onSymbolChange={changeSymbol}
-            onToggle={toggle}
-          />
+          {sections}
+          <MarketMovers />
+        </>
+      )}
+      {status === 'partial' && (
+        <>
+          <PartialFailureBanner failed={failed} onRetryAll={refresh} />
+          {sections}
+          <MarketMovers />
+          {failed.map((section) => (
+            <FailedSectionCard key={section} section={section} onReload={retry} />
+          ))}
         </>
       )}
     </div>
